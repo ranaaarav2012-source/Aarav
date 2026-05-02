@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aura OS</title>
+    <link href="style.css" rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        :root {
+            --sand: #f5ede0;
+            --warm: #e8d5b7;
+            --peach: #f0a080;
+            --rose: #e07060;
+            --teal: #4a9d8f;
+            --teal-light: #6abcad;
+            --sky: #87c4d4;
+            --text: #3a2e26;
+            --text-soft: #7a6a5a;
+            --glass: rgba(255, 255, 255, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.7);
+            --shadow: rgba(90, 60, 40, 0.18);
+            --radius: 18px;
+            --radius-sm: 10px;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            cursor: default;
+        }
+
+
+        .desktop {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(160deg, #fde8d0 0%, #fcd5b0 30%, #c8e8e0 70%, #a8d4e8 100%);
+        }
+
+
+        .desktop::before,
+        .desktop::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+        }
+
+        .desktop::before {
+            width: 500px;
+            height: 500px;
+            background: rgba(240, 160, 128, 0.3);
+            top: -100px;
+            left: -100px;
+        }
+
+        .desktop::after {
+            width: 400px;
+            height: 400px;
+            background: rgba(135, 196, 212, 0.3);
+            bottom: 60px;
+            right: -80px;
+        }
+
+
+        .greeting {
+            position: absolute;
+            top: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            pointer-events: none;
+            z-index: 5;
+            animation: fadeDown 0.7s ease both;
+        }
+
+        .greeting h1 {
+            font-family: monospace;
+            font-style: italic;
+            font-size: 1.4rem;
+            color: var(--text);
+            opacity: 0.75;
+            font-weight: 400;
+        }
+
+
+        .icons {
+            position: absolute;
+            top: 90px;
+            left: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 10;
+        }
+
+        .icon {
+            width: 82px;
+            text-align: center;
+            cursor: pointer;
+            padding: 10px 6px 8px;
+            border-radius: var(--radius-sm);
+            transition: transform 0.18s ease, background 0.18s;
+            animation: popIn 0.5s cubic-bezier(.34, 1.56, .64, 1) both;
+        }
+
+        .icon:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .icon:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .icon:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .icon:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .icon:hover {
+            background: rgba(255, 255, 255, 0.45);
+            transform: translateY(-4px) scale(1.05);
+        }
+
+        .icon:active {
+            transform: scale(0.96);
+        }
+
+        .icon-img {
+            font-size: 36px;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .icon-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: 0.02em;
+            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8);
+        }
+
+
+        .window {
+            position: absolute;
+            background: var(--glass);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1.5px solid var(--glass-border);
+            border-radius: var(--radius);
+            box-shadow: 0 20px 60px var(--shadow), 0 2px 8px rgba(255, 255, 255, 0.5) inset;
+            display: flex;
+            flex-direction: column;
+            min-width: 280px;
+            animation: windowOpen 0.3s cubic-bezier(.34, 1.56, .64, 1) both;
+        }
+
+        @keyframes windowOpen {
+            from {
+                opacity: 0;
+                transform: scale(0.88) translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .title-bar {
+            padding: 14px 16px 12px;
+            border-radius: var(--radius) var(--radius) 0 0;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .title-bar:active {
+            cursor: grabbing;
+        }
+
+        .title-text {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            flex: 1;
+            letter-spacing: 0.01em;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 7px;
+        }
+
+        .wc-btn {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: transparent;
+            transition: color 0.15s, filter 0.15s;
+        }
+
+        .wc-btn:hover {
+            color: rgba(0, 0, 0, 0.5);
+            filter: brightness(0.88);
+        }
+
+        .wc-close {
+            background: #ff6057;
+        }
+
+        .wc-min {
+            background: #ffbd2e;
+        }
+
+        .window-content {
+            padding: 18px 20px 20px;
+            color: var(--text);
+            border-radius: 0 0 var(--radius) var(--radius);
+            overflow: hidden;
+        }
+
+
+        .calc-display {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            text-align: right;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 14px;
+            min-height: 52px;
+            overflow: hidden;
+            letter-spacing: -0.02em;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .calc-grid button {
+            padding: 12px 6px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Nunito', sans-serif;
+            cursor: pointer;
+            border: 1.5px solid rgba(255, 255, 255, 0.7);
+            border-radius: var(--radius-sm);
+            transition: transform 0.12s, filter 0.12s;
+            color: var(--text);
+        }
+
+        .calc-grid button:hover {
+            filter: brightness(0.94);
+            transform: translateY(-1px);
+        }
+
+        .calc-grid button:active {
+            transform: scale(0.94);
+        }
+
+        .btn-num {
+            background: rgba(255, 255, 255, 0.65);
+        }
+
+        .btn-op {
+            background: rgba(74, 157, 143, 0.25);
+            color: var(--teal);
+        }
+
+        .btn-eq {
+            background: var(--peach);
+            color: white;
+            border-color: var(--peach);
+        }
+
+        .btn-clr {
+            background: rgba(224, 112, 96, 0.2);
+            color: var(--rose);
+        }
+
+
+        .note-toolbar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .note-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1.5px solid rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.55);
+            font-family: 'Nunito', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .note-btn:hover {
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        .note-btn.save-btn {
+            background: var(--teal);
+            color: white;
+            border-color: var(--teal);
+        }
+
+        .note-btn.save-btn:hover {
+            background: var(--teal-light);
+        }
+
+        .note-area {
+            width: 100%;
+            height: 160px;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1.5px solid rgba(255, 255, 255, 0.8);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            font-family: 'Lora', serif;
+            font-size: 14px;
+            color: var(--text);
+            resize: none;
+            outline: none;
+            line-height: 1.7;
+            user-select: text;
+        }
+
+        .note-area::placeholder {
+            color: rgba(90, 70, 50, 0.4);
+            font-style: italic;
+        }
+
+        .note-area:focus {
+            border-color: var(--teal-light);
+            box-shadow: 0 0 0 3px rgba(74, 157, 143, 0.15);
+        }
+
+
+        .about-content {
+            line-height: 1.8;
+        }
+
+        .about-content .os-name {
+            font-family: 'Lora', serif;
+            font-size: 1.5rem;
+            font-style: italic;
+            color: var(--teal);
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .about-content .tagline {
+            font-size: 12px;
+            color: var(--text-soft);
+            margin-bottom: 14px;
+        }
+
+        .about-features {
+            list-style: none;
+            font-size: 13px;
+        }
+
+        .about-features li {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .about-features li:last-child {
+            border-bottom: none;
+        }
+
+
+        .weather-widget {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .weather-big {
+            font-size: 64px;
+            line-height: 1;
+        }
+
+        .weather-temp {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--text);
+            margin: 6px 0 2px;
+        }
+
+        .weather-desc {
+            color: var(--text-soft);
+            font-size: 14px;
+        }
+
+        .weather-loc {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--teal);
+            margin-top: 6px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+
+        .taskbar {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1.5px solid rgba(255, 255, 255, 0.85);
+            border-radius: 30px;
+            padding: 8px 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 200;
+            box-shadow: 0 8px 32px rgba(90, 60, 40, 0.15), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+            animation: fadeUp 0.5s ease 0.2s both;
+        }
+
+        .tb-btn {
+            padding: 6px 16px;
+            border-radius: 20px;
+            background: transparent;
+            border: none;
+            font-family: 'Nunito', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            transition: background 0.15s, transform 0.12s;
+            white-space: nowrap;
+        }
+
+        .tb-btn:hover {
+            background: rgba(255, 255, 255, 0.6);
+            transform: translateY(-1px);
+        }
+
+        .tb-btn:active {
+            transform: scale(0.95);
+        }
+
+        .tb-divider {
+            width: 1px;
+            height: 22px;
+            background: rgba(90, 60, 40, 0.15);
+        }
+
+        .tb-clock {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-soft);
+            min-width: 68px;
+            text-align: right;
+        }
+
+
+        .toast {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(14px);
+            border: 1.5px solid rgba(255, 255, 255, 0.85);
+            border-radius: var(--radius);
+            padding: 12px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            box-shadow: 0 6px 20px var(--shadow);
+            z-index: 999;
+            animation: toastIn 0.3s ease both;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes fadeDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.7);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="desktop" id="desktop">
+
+        <div class="greeting">
+            <h1 id="greetText">Good morning ☀️</h1>
+        </div>
+
+        <div class="icons">
+            <div class="icon" data-app="calculator">
+                <div class="icon-img">🧮</div>
+                <div class="icon-label">Calculator</div>
+            </div>
+            <div class="icon" data-app="notepad">
+                <div class="icon-img">📓</div>
+                <div class="icon-label">Notepad</div>
+            </div>
+            <div class="icon" data-app="weather">
+                <div class="icon-img">🌤️</div>
+                <div class="icon-label">Weather</div>
+            </div>
+            <div class="icon" data-app="about">
+                <div class="icon-img">🌸</div>
+                <div class="icon-label">About</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="taskbar">
+        <button class="tb-btn" id="startBtn">🍀 Aura</button>
+        <div class="tb-divider"></div>
+        <button class="tb-btn" data-app="calculator">🧮 Calc</button>
+        <button class="tb-btn" data-app="notepad">📓 Notes</button>
+        <button class="tb-btn" data-app="weather">🌤 Weather</button>
+        <div class="tb-divider"></div>
+        <div class="tb-clock" id="clock">--:-- --</div>
+    </div>
+    <script src="https://unpkg.com/kursor"></script>
+    <script>
+        new kursor({
+            type: 4
+        })
+    </script>
+
+    <script>
+        let zIdx = 100;
+        let active = {};
+
+        // Greeting
+        const hour = new Date().getHours();
+        const greet = hour < 12 ? 'Good morning ☀️' : hour < 17 ? 'Good afternoon 🌿' : 'Good evening 🌙';
+        document.getElementById('greetText').textContent = greet;
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; setTimeout(() => t.remove(), 300); }, 2200);
+        }
+
+        function createWindow(id, title, emoji, html, w = 380, h = 'auto') {
+            if (active[id]) {
+                const ex = document.getElementById(`win-${id}`);
+                if (ex) { ex.style.display = ''; ex.style.zIndex = ++zIdx; }
+                return;
+            }
+
+            const count = Object.keys(active).length;
+            const win = document.createElement('div');
+            win.className = 'window';
+            win.id = `win-${id}`;
+            win.style.cssText = `width:${w}px; top:${80 + count * 28}px; left:${160 + count * 32}px; z-index:${++zIdx};`;
+
+            win.innerHTML = `
+      <div class="title-bar">
+        <span style="font-size:16px">${emoji}</span>
+        <span class="title-text">${title}</span>
+        <div class="window-controls">
+          <button class="wc-btn wc-min" title="Minimise">–</button>
+          <button class="wc-btn wc-close" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="window-content">${html}</div>
+    `;
+
+            document.getElementById('desktop').appendChild(win);
+            active[id] = true;
+
+            // Drag
+            const bar = win.querySelector('.title-bar');
+            let drag = false, ox, oy;
+            bar.addEventListener('mousedown', e => {
+                if (e.target.classList.contains('wc-btn')) return;
+                drag = true; ox = e.clientX - win.offsetLeft; oy = e.clientY - win.offsetTop;
+                win.style.zIndex = ++zIdx;
+            });
+            document.addEventListener('mousemove', e => {
+                if (!drag) return;
+                win.style.left = Math.max(0, Math.min(window.innerWidth - win.offsetWidth, e.clientX - ox)) + 'px';
+                win.style.top = Math.max(0, Math.min(window.innerHeight - 80, e.clientY - oy)) + 'px';
+            });
+            document.addEventListener('mouseup', () => drag = false);
+
+            win.querySelector('.wc-close').addEventListener('click', () => { win.remove(); delete active[id]; });
+            win.querySelector('.wc-min').addEventListener('click', () => { win.style.display = 'none'; delete active[id]; });
+            win.addEventListener('mousedown', () => win.style.zIndex = ++zIdx);
+        }
+
+        // Apps
+        function openCalculator() {
+            createWindow('calculator', 'Calculator', '🧮', `
+      <div class="calc-display" id="calcDisplay">0</div>
+      <div class="calc-grid">
+        <button class="btn-clr" data-clear>C</button>
+        <button class="btn-op" data-op="%">%</button>
+        <button class="btn-op" data-op="**">^</button>
+        <button class="btn-op" data-op="/">÷</button>
+        <button class="btn-num" data-val="7">7</button>
+        <button class="btn-num" data-val="8">8</button>
+        <button class="btn-num" data-val="9">9</button>
+        <button class="btn-op" data-op="*">×</button>
+        <button class="btn-num" data-val="4">4</button>
+        <button class="btn-num" data-val="5">5</button>
+        <button class="btn-num" data-val="6">6</button>
+        <button class="btn-op" data-op="-">−</button>
+        <button class="btn-num" data-val="1">1</button>
+        <button class="btn-num" data-val="2">2</button>
+        <button class="btn-num" data-val="3">3</button>
+        <button class="btn-op" data-op="+">+</button>
+        <button class="btn-num" style="grid-column:span 2" data-val="0">0</button>
+        <button class="btn-num" data-val=".">.</button>
+        <button class="btn-eq" data-eval>=</button>
+      </div>
+    `, 300);
+
+            setTimeout(() => {
+                const win = document.getElementById('win-calculator');
+                if (!win) return;
+                const disp = win.querySelector('#calcDisplay');
+                let val = '0';
+                win.querySelectorAll('.calc-grid button').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        if ('val' in btn.dataset) {
+                            val = (val === '0' && btn.dataset.val !== '.') ? btn.dataset.val : val + btn.dataset.val;
+                        } else if ('op' in btn.dataset) {
+                            val += ' ' + btn.dataset.op + ' ';
+                        } else if ('eval' in btn.dataset) {
+                            try { val = String(eval(val.replace(/[^-()\d/*+.%]/g, '').replace('%', '/100'))); }
+                            catch { val = 'Oops!'; }
+                        } else if ('clear' in btn.dataset) {
+                            val = '0';
+                        }
+                        disp.textContent = val;
+                    });
+                });
+            }, 10);
+        }
+
+        function openNotepad() {
+            createWindow('notepad', 'Notepad', '📓', `
+      <div class="note-toolbar">
+        <button class="note-btn save-btn" id="saveNote">💾 Save</button>
+        <button class="note-btn" id="clearNote">🗑 Clear</button>
+      </div>
+      <textarea class="note-area" id="noteText" placeholder="Start writing something lovely..."></textarea>
+    `, 420);
+
+            setTimeout(() => {
+                const win = document.getElementById('win-notepad');
+                if (!win) return;
+                win.querySelector('#saveNote').addEventListener('click', () => {
+                    const txt = win.querySelector('#noteText').value;
+                    if (txt.trim()) { localStorage.setItem('aura-note', txt); showToast('✅ Note saved!'); }
+                    else showToast('Nothing to save yet 😊');
+                });
+                win.querySelector('#clearNote').addEventListener('click', () => {
+                    win.querySelector('#noteText').value = '';
+                    showToast('🗑 Cleared!');
+                });
+                const saved = localStorage.getItem('aura-note');
+                if (saved) win.querySelector('#noteText').value = saved;
+            }, 10);
+        }
+
+        function openWeather() {
+            createWindow('weather', 'Weather', '🌤️', `
+      <div class="weather-widget">
+        <div class="weather-big">🌤️</div>
+        <div class="weather-temp">24°C</div>
+        <div class="weather-desc">Partly Cloudy · Feels like 26°</div>
+        <div class="weather-loc">📍 Your City</div>
+        <div style="margin-top:16px; display:flex; justify-content:center; gap:20px; font-size:13px; color:var(--text-soft)">
+          <div>💧 Humidity<br><strong style="color:var(--text)">58%</strong></div>
+          <div>💨 Wind<br><strong style="color:var(--text)">12 km/h</strong></div>
+          <div>☀️ UV Index<br><strong style="color:var(--text)">Moderate</strong></div>
+        </div>
+      </div>
+    `, 320);
+        }
+
+        function openAbout() {
+            createWindow('about', 'About Aura OS', '🌸', `
+      <div class="about-content">
+        <span class="os-name">Aura OS</span>
+        <div class="tagline">A warm, friendly web desktop experience</div>
+        <ul class="about-features">
+          <li>🪟 Glassmorphic draggable windows</li>
+          <li>🧮 Fully working calculator</li>
+          <li>📓 Notepad with local save</li>
+          <li>🌤 Weather widget</li>
+          <li>🎨 Soft warm aesthetic</li>
+          <li>⏰ Live clock & greeting</li>
+        </ul>
+        <p style="font-size:11px; color:var(--text-soft); margin-top:14px; text-align:center">Made with 💛 HTML · CSS · JS</p>
+      </div>
+    `, 320);
+        }
+
+        // Event binding
+        document.querySelectorAll('[data-app]').forEach(el => {
+            el.addEventListener('click', e => {
+                const app = e.currentTarget.dataset.app;
+                if (app === 'calculator') openCalculator();
+                else if (app === 'notepad') openNotepad();
+                else if (app === 'weather') openWeather();
+                else if (app === 'about') openAbout();
+            });
+        });
+
+        document.getElementById('startBtn').addEventListener('click', () => showToast('🍀 Welcome to Aura OS!'));
+
+        // Clock
+        function tick() {
+            const d = new Date();
+            const h = d.getHours(), m = String(d.getMinutes()).padStart(2, '0');
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            document.getElementById('clock').textContent = `${h % 12 || 12}:${m} ${ampm}`;
+        }
+        tick(); setInterval(tick, 1000);
+
+    </script>
+</body>
+
+</html>
